@@ -15,15 +15,29 @@ class _SignupState extends State<Signup> {
   TextEditingController password = TextEditingController();
 
   signUp() async {
-    // Create a new user in Firebase Authentication
-    await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: email.text.trim(),
-      password: password.text.trim(),
-    );
+    try {
+      // Create a new user in Firebase Authentication
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email.text.trim(),
+        password: password.text.trim(),
+      );
 
-    // Navigate to the Wrapper to handle redirection
-    Get.offAll(() => Wrapper());
+      // Navigate to the Wrapper to handle redirection
+      Get.offAll(() => Wrapper());
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        // Display a message if the email is already in use
+        Get.snackbar(
+          "Error",
+          "The email address is already registered.",
+          snackPosition: SnackPosition.BOTTOM,
+          // backgroundColor: Colors.redAccent,
+          // colorText: Colors.white,
+        );
+      }
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +74,7 @@ class _SignupState extends State<Signup> {
           ),
         ),
       ),
-      backgroundColor: Color(0xB5D2EFA1),
+      backgroundColor: Color(0xB5CFEAA5),
     );
   }
 }

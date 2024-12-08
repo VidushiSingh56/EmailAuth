@@ -1,19 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'login.dart';
+import 'package:projectemailauthdec1/login.dart';
 
-class Homepage extends StatefulWidget {
-  const Homepage({super.key});
+class ScreenA extends StatefulWidget {
+  const ScreenA({super.key});
 
   @override
-  State<Homepage> createState() => _HomepageState();
+  State<ScreenA> createState() => _ScreenAState();
 }
 
-class _HomepageState extends State<Homepage> {
+class _ScreenAState extends State<ScreenA> {
 
   final user = FirebaseAuth.instance.currentUser;
-
 
   signout() async {
     await FirebaseAuth.instance.signOut();
@@ -26,17 +25,27 @@ class _HomepageState extends State<Homepage> {
   }
 
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("HomePgae")),
+      appBar: AppBar(
+          title: Text("Screen A")
+      ),
       body: Center(
-        child:Text('${user!.email}'),
+        child: Text(
+          "HIII student ${user!.email}",
+          style: TextStyle(
+            fontSize: 24, // Increases the font size
+            fontWeight: FontWeight.bold, // Makes the text bold
+          ),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-          onPressed: (()=>signout()),
-      child: Icon(Icons.login_rounded),
+        onPressed: (() => signout()),
+        child: Icon(Icons.login_rounded),
       ),
+
     );
   }
 }
