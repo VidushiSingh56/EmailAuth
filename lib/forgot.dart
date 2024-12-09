@@ -1,8 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:projectemailauthdec1/wrapper.dart';
+import 'package:projectemailauthdec1/login.dart';
 
 class Forgot extends StatefulWidget {
   const Forgot({super.key});
@@ -12,22 +11,58 @@ class Forgot extends StatefulWidget {
 }
 
 class _ForgotState extends State<Forgot> {
-
   TextEditingController email = TextEditingController();
 
-  reset()async
-  {
-    await FirebaseAuth.instance.sendPasswordResetEmail(email: email.text);
-    Get.offAll(Wrapper());
-  }
+  reset() async {
+    if (email.text.isEmpty) {
+      // Show an error if email is empty
+      Get.snackbar(
+        "Error",
+        "Please enter your email address.",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.8),
+        colorText: Colors.white,
+        margin: EdgeInsets.all(20),
+      );
+      return;
+    }
 
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email.text);
+
+      // Notify user about the email
+      Get.snackbar(
+        "Email Sent",
+        "A password reset link has been sent to your email.",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.withOpacity(0.8),
+        colorText: Colors.white,
+        margin: EdgeInsets.all(20),
+      );
+
+      // Redirect to login page after a delay
+      Future.delayed(Duration(seconds: 2), () {
+        Get.offAll(() => Login());
+      });
+    } catch (e) {
+      // Handle errors, such as invalid email
+      Get.snackbar(
+        "Error",
+        "Failed to send reset email. Please try again.",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.8),
+        colorText: Colors.white,
+        margin: EdgeInsets.all(20),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Forgot Password"),
-        backgroundColor: Color(0xE7F6E107), // ARGB format
+          backgroundColor: Color(0xFF34B89B) // ARGB format
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -40,12 +75,26 @@ class _ForgotState extends State<Forgot> {
                 children: [
                   TextField(
                     controller: email,
-                    decoration: InputDecoration(hintText: 'Enter email'),
+                    decoration: InputDecoration(
+                      hintText: 'Enter email',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () => reset(),
-                    child: Text("Send Link"),
+                    onPressed: reset,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.amber,
+                      minimumSize: Size(130, 50),// Background color of the button
+                    ),
+                    child: Text(
+                      "Send Reset Link",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20// Text color
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -53,7 +102,7 @@ class _ForgotState extends State<Forgot> {
           ),
         ),
       ),
-      backgroundColor: Color(0xB5D2EFA1),
+      backgroundColor: Color(0xFFFFFFFF),
     );
   }
 }

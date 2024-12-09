@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+import 'package:projectemailauthdec1/Students/screenA.dart';
+import 'package:projectemailauthdec1/Tutors/screenB.dart';
 import 'package:projectemailauthdec1/forgot.dart';
 import 'package:projectemailauthdec1/signup.dart';
 
@@ -22,23 +24,58 @@ class _LoginState extends State<Login> {
   signIn() async {
     if (email.text.isEmpty || password.text.isEmpty) {
       // If either email or password is empty, show a Snackbar
-      
       Get.snackbar(
         "No entry.",
         "Please enter both email and password.",
         margin: EdgeInsets.all(20),
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.8)
+        backgroundColor: Colors.red.withOpacity(0.8),
       );
       return; // Exit the function early
     }
 
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email.text,
-        password: password.text,
-      );
-      Get.offAll(() => Homepage());
+      // Sign in the user
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email.text, password: password.text);
+
+      // Get the current user's ID
+      final String userId = userCredential.user!.uid;
+
+      // Retrieve the user's role from Firestore
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        String role = userDoc['role']; // Assuming the 'role' field is saved
+
+        // Redirect the user based on their role
+        if (role == 'Student') {
+          Get.offAll(() => ScreenA()); // Replace with your Student screen
+        } else if (role == 'Tutor') {
+          Get.offAll(() => ScreenB()); // Replace with your Tutor screen
+        } else {
+          // Handle unknown roles
+          Get.snackbar(
+            "Error",
+            "Unknown role assigned to the user.",
+            margin: EdgeInsets.all(20),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red.withOpacity(0.8),
+          );
+        }
+      } else {
+        // Handle case where user document doesn't exist
+        Get.snackbar(
+          "Error",
+          "User data not found.",
+          margin: EdgeInsets.all(20),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.withOpacity(0.8),
+        );
+      }
     } catch (e) {
       // If login fails, show a Snackbar
       ScaffoldMessenger.of(context).showSnackBar(
@@ -57,7 +94,7 @@ class _LoginState extends State<Login> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Login"),
-        backgroundColor: Color(0xE7F6E107), // ARGB format
+        backgroundColor: Color(0xFF34B89B) // ARGB format
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -78,11 +115,22 @@ class _LoginState extends State<Login> {
                     obscureText: true, // To hide the password input
                     decoration: InputDecoration(hintText: 'Enter password'),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 40),
                   ElevatedButton(
                     onPressed: signIn,
-                    child: Text("Login"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.amber,
+                      minimumSize: Size(130, 50),// Background color of the button
+                    ),
+                    child: Text(
+                      "Login",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20// Text color
+                      ),
+                    ),
                   ),
+
                   SizedBox(height: 20),
                   // Center the "Not a user? Register Now" text
                   Center(
@@ -126,7 +174,8 @@ class _LoginState extends State<Login> {
           ),
         ),
       ),
-      backgroundColor: Color(0xB5D2EFA1),
+      backgroundColor: Color(0xFFFFFFFF)
     );
+
   }
 }
