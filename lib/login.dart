@@ -2,11 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:projectemailauthdec1/Students/screenA.dart';
-import 'package:projectemailauthdec1/Tutors/screenB.dart';
+import 'package:projectemailauthdec1/Information/locations.dart';
+import 'package:projectemailauthdec1/Tutors/home_tutor.dart';
 import 'package:projectemailauthdec1/forgot.dart';
 import 'package:projectemailauthdec1/signup.dart';
 
+import 'package:projectemailauthdec1/Students/home_student.dart';
+import 'Information/details.dart';
 import 'homepage.dart';
 
 class Login extends StatefulWidget {
@@ -23,7 +25,6 @@ class _LoginState extends State<Login> {
 
   signIn() async {
     if (email.text.isEmpty || password.text.isEmpty) {
-      // If either email or password is empty, show a Snackbar
       Get.snackbar(
         "No entry.",
         "Please enter both email and password.",
@@ -31,33 +32,50 @@ class _LoginState extends State<Login> {
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.withOpacity(0.8),
       );
-      return; // Exit the function early
+      return;
     }
 
     try {
-      // Sign in the user
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email.text, password: password.text);
 
-      // Get the current user's ID
       final String userId = userCredential.user!.uid;
 
-      // Retrieve the user's role from Firestore
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
           .get();
 
       if (userDoc.exists) {
-        String role = userDoc['role']; // Assuming the 'role' field is saved
+        String role = userDoc['role'];
+        String emails = userDoc['email'];
+        bool isLocationFilled = userDoc['location'] != null;
+        // bool isDetailsFilled = userDoc['detailsFilled'] ?? false;
 
-        // Redirect the user based on their role
-        if (role == 'Student') {
-          Get.offAll(() => ScreenA()); // Replace with your Student screen
-        } else if (role == 'Tutor') {
-          Get.offAll(() => ScreenB()); // Replace with your Tutor screen
+        if (role == 'Tutor' || role == 'Student') {
+          if (!isLocationFilled) {
+            Get.offAll(() => Locations(email: email.text, role : role)); // Pass email
+            return;
+          }
+
+          // if (!isDetailsFilled) {
+          //   Get.offAll(() => Details(
+          //     email: email.text,
+          //     role : role,
+          //     locationName: userDoc['location'],
+          //   )); // Pass email
+          //   return;
+          // }
+
+          if (role == 'Tutor') {
+            print(emails + "" + role);
+            Get.offAll(() => HomeB());
+
+          } else if (role == 'Student') {
+            print(emails + "" + role);
+            Get.offAll(() => HomeA());
+          }
         } else {
-          // Handle unknown roles
           Get.snackbar(
             "Error",
             "Unknown role assigned to the user.",
@@ -67,7 +85,6 @@ class _LoginState extends State<Login> {
           );
         }
       } else {
-        // Handle case where user document doesn't exist
         Get.snackbar(
           "Error",
           "User data not found.",
@@ -77,7 +94,7 @@ class _LoginState extends State<Login> {
         );
       }
     } catch (e) {
-      // If login fails, show a Snackbar
+      print("Sign-in Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Invalid email or password. Please try again.'),
@@ -86,6 +103,8 @@ class _LoginState extends State<Login> {
       );
     }
   }
+
+
 
 
 

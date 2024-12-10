@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore package
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:projectemailauthdec1/choose.dart';
+import 'package:projectemailauthdec1/Information/role.dart';
 import 'package:projectemailauthdec1/wrapper.dart';
 
 class Signup extends StatefulWidget {

@@ -1,17 +1,32 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:projectemailauthdec1/login.dart';
 import 'details.dart'; // Import the Details screen
 
-class ScreenA extends StatefulWidget {
-  const ScreenA({super.key});
+class Locations extends StatefulWidget {
+
+  final String email;
+  final String role;
+  const Locations({Key? key, required this.email, required this.role}) : super(key: key);
 
   @override
-  State<ScreenA> createState() => _ScreenAState();
+  State<Locations> createState() => _LocationsState();
 }
 
-class _ScreenAState extends State<ScreenA> {
-  final user = FirebaseAuth.instance.currentUser;
+class _LocationsState extends State<Locations> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // Function to save the location to Firestore
+  Future<void> saveLocation(String location) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+        'location': location,
+        'isLocationFilled': true,
+      });
+    }
+  }
 
   signout() async {
     await FirebaseAuth.instance.signOut();
@@ -24,13 +39,15 @@ class _ScreenAState extends State<ScreenA> {
   }
 
   void onLocationTap(String locationName) {
-    // Navigate to the Details screen with the selected location
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => Details(locationName: locationName), // Pass location name to Details screen
-      ),
-    );
+    // Save the location to Firestore and navigate to the Details screen
+    saveLocation(locationName).then((_) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Details(email:widget.email,role:widget.role,locationName: locationName), // Pass location name to Details screen
+        ),
+      );
+    });
   }
 
   @override

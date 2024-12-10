@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Add Firestore package
-import 'package:projectemailauthdec1/choose.dart';
+import 'package:projectemailauthdec1/Information/role.dart';
 import 'package:projectemailauthdec1/login.dart';
-import 'package:projectemailauthdec1/Students/screenA.dart';
-import 'package:projectemailauthdec1/Tutors/screenB.dart';
-import 'package:projectemailauthdec1/verify.dart';
+import 'package:projectemailauthdec1/Information/locations.dart';
+import 'package:projectemailauthdec1/Information/details.dart'; // Import Details screen
+import 'package:projectemailauthdec1/Tutors/home_tutor.dart';
+import 'package:projectemailauthdec1/Students/home_student.dart';
 
 class Wrapper extends StatefulWidget {
   const Wrapper({super.key});
@@ -15,16 +16,28 @@ class Wrapper extends StatefulWidget {
 }
 
 class _WrapperState extends State<Wrapper> {
-  // Function to get the user's role from Firestore
-  Future<String?> getUserRole() async {
+  // Function to get the user's details from Firestore
+  Future<Map<String, dynamic>?> getUserDetails() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      DocumentSnapshot roleDoc = await FirebaseFirestore.instance
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .get();
 
-      return roleDoc['role']; // Return the saved role
+      if (userDoc.exists) {
+        // Extract role and location information
+        String role = userDoc['role'];
+        bool isLocationFilled = userDoc['location'] != null;
+        String email = user.email ?? '';
+
+        return {
+          'role': role,
+          'isLocationFilled': isLocationFilled,
+          'locationName': userDoc['location'], // Optional: Pass location name if needed
+          'email': email,
+        };
+      }
     }
     return null;
   }
@@ -34,39 +47,44 @@ class _WrapperState extends State<Wrapper> {
     return Scaffold(
       body: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot)
-        {
+        builder: (context, snapshot) {
           // Check if user is authenticated
-          if (snapshot.hasData)
-          {
-            final user = FirebaseAuth.instance.currentUser;
-            if (user != null)
-            {
-              // Check role and navigate accordingly
-              return FutureBuilder<String?>(
-                future: getUserRole(),
-                builder: (context, roleSnapshot)
-                {
-                  if (roleSnapshot.connectionState == ConnectionState.waiting)
-                  {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                  if (roleSnapshot.hasData)
-                  {
-                    if (roleSnapshot.data == 'Student')
-                    {
-                      return ScreenA(); // Navigate to Student screen
-                    } else if (roleSnapshot.data == 'Tutor')
-                    {
-                      return ScreenB(); // Navigate to Tutor screen
-                    }
-                  }
-                  return Choose(); // Default to role selection if no role
-                },
-              );
-            }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
           }
-          // Return the login screen if no user is authenticated
+
+          if (snapshot.hasData) {
+            return FutureBuilder<Map<String, dynamic>?>(
+              future: getUserDetails(), // Fetch user details directly from Firestore
+              builder: (context, detailsSnapshot) {
+                if (detailsSnapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                if (detailsSnapshot.hasData) {
+                  var details = detailsSnapshot.data!;
+                  if (details['isLocationFilled']) {
+                    // Navigate to the respective Home screen based on role
+                    if (details['role'] == 'tutor') {
+                      return HomeA(); // Home screen for tutors
+                    } else if (details['role'] == 'student') {
+                      return HomeB(); // Home screen for students
+                    }
+                  } else {
+                    // If location is not filled, navigate to Locations screen
+                    return Locations(
+                      email: details['email'],
+                      role : details['role']// Pass email as parameter
+                    );
+                  }
+                }
+                // Default to Choose screen if no data is found
+                return Choose();
+              },
+            );
+          }
+
+          // Return Login screen if user is not authenticated
           return Login();
         },
       ),
