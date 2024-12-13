@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:projectemailauthdec1/login.dart';
+import 'package:projectemailauthdec1/authentication/login.dart';
 import 'details.dart'; // Import the Details screen
 
 class Locations extends StatefulWidget {
@@ -21,7 +21,7 @@ class _LocationsState extends State<Locations> {
   Future<void> saveLocation(String location) async {
     final user = _auth.currentUser;
     if (user != null) {
-      FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+      FirebaseFirestore.instance.collection('user').doc(user.uid).update({
         'location': location,
         'isLocationFilled': true,
       });

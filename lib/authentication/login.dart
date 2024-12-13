@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:projectemailauthdec1/Information/locations.dart';
 import 'package:projectemailauthdec1/Tutors/home_tutor.dart';
-import 'package:projectemailauthdec1/forgot.dart';
-import 'package:projectemailauthdec1/signup.dart';
+import 'package:projectemailauthdec1/authentication/forgot.dart';
+import 'package:projectemailauthdec1/authentication/signup.dart';
 
 import 'package:projectemailauthdec1/Students/home_student.dart';
-import 'Information/details.dart';
+import '../Information/details.dart';
 import 'homepage.dart';
 
 class Login extends StatefulWidget {
@@ -42,7 +42,7 @@ class _LoginState extends State<Login> {
       final String userId = userCredential.user!.uid;
 
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
+          .collection('user')
           .doc(userId)
           .get();
 

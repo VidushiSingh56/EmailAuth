@@ -58,7 +58,7 @@ class _DetailsState extends State<Details> {
 
         // Reference to the user's document in Firestore
         DocumentReference userDetails = FirebaseFirestore.instance
-            .collection('users')
+            .collection('user')
             .doc(uid);
 
         // Save details in Firestore (overwrite or create if not exists)
@@ -96,15 +96,9 @@ class _DetailsState extends State<Details> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: null,
-        backgroundColor: Color(0xFF34B89B),
-        toolbarHeight: 90.0,
-        title: Text(
-          "Details",
-          style: TextStyle(fontSize: 25, color: Colors.white),
-        ),
-      ),
+
+
+
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(

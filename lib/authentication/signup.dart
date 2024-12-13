@@ -33,7 +33,7 @@ class _SignupState extends State<Signup> {
         print("User email: ${user.email}"); // Debugging line
 
         // Create a reference to Firestore and add the user details
-        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        await FirebaseFirestore.instance.collection('user').doc(user.uid).set({
           'email': user.email,        // User's email
           'role': 'new',              // You can set role to "new" or any default role
         });

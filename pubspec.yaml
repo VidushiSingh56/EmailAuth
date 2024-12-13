@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  fluttertoast: ^8.2.8
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -39,6 +40,17 @@ dependencies:
   firebase_auth: ^5.3.4
   get: ^4.6.6
   cloud_firestore: ^5.5.1
+  firebase_storage: ^12.3.7
+  permission_handler: ^11.3.1
+  filesystem_picker: ^4.0.0
+  file_picker: ^8.1.5
+#  fluttertoast: ^8.2.8
+
+dependency_overrides:
+  file_picker:
+    git:
+      url: https://github.com/abdelaziz-mahdy/flutter_file_picker
+      ref: fix-flutter-3.27-compile-error
 
 dev_dependencies:
   flutter_test:

@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:projectemailauthdec1/Information/locations.dart';
 import 'package:projectemailauthdec1/Tutors/home_tutor.dart';
 
-import '../login.dart';
+import '../authentication/login.dart';
 
 class Choose extends StatefulWidget {
   const Choose({super.key});
@@ -48,7 +48,7 @@ class _ChooseState extends State<Choose> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       await FirebaseFirestore.instance
-          .collection('users')
+          .collection('user')
           .doc(user.uid)
           .set({
         'role': role,         // Save the role

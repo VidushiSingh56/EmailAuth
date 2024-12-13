@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Add Firestore package
 import 'package:projectemailauthdec1/Information/role.dart';
-import 'package:projectemailauthdec1/login.dart';
+import 'package:projectemailauthdec1/authentication/login.dart';
 import 'package:projectemailauthdec1/Information/locations.dart';
 import 'package:projectemailauthdec1/Information/details.dart'; // Import Details screen
 import 'package:projectemailauthdec1/Tutors/home_tutor.dart';
@@ -21,7 +21,7 @@ class _WrapperState extends State<Wrapper> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
+          .collection('user')
           .doc(user.uid)
           .get();
 
