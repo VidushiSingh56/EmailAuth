@@ -64,29 +64,57 @@ class _FindHomeTutorsState extends State<FindHomeTutors> {
     'Hyderabad'
   ];
 
+  // List<DocumentSnapshot> tutorsList = [];
+  //
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   fetchTutors();
+  // }
+  //
+  // void fetchTutors() async {
+  //   // Replace this with your actual Firebase query or data fetching logic
+  //   QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('tutors').get();
+  //   setState(() {
+  //     tutorsList = snapshot.docs;
+  //   });
+  // }
+
+
   void searchTutors() async {
-    // Fetch tutors matching the criteria from Firestore
+    // Fetch all tutors with the role 'Tutor'
     final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('user') // Replace 'users' with your actual collection name
-        .where('role', isEqualTo: 'Tutor') // Ensure only tutors are retrieved
-        .where('subject', isEqualTo: selectedSubject)
-        .where('location', isEqualTo: selectedCity)
-        // .where('board', isEqualTo: selectedBoard)
-        .where('classes', isEqualTo: selectedClass) // Assume 'class' is a list
+        .collection('user') // Replace 'user' with your actual collection name
+        .where('role', isEqualTo: 'Tutor')
         .get();
 
-    final List<DocumentSnapshot> tutors = querySnapshot.docs;
+    final List<DocumentSnapshot> allTutors = querySnapshot.docs;
 
-    // Navigate to ViewTutorList page with the fetched tutors
+    // Filter tutors manually based on the selected criteria
+    final List<DocumentSnapshot> matchingTutors = allTutors.where((tutor) {
+      final subjectMatch = tutor['subject'] == selectedSubject;
+      final cityMatch = tutor['location'] == selectedCity;
+      final classMatch = tutor['classes'] == selectedClass;
+
+      // Add more conditions if needed
+      return subjectMatch || cityMatch || classMatch;
+    }).toList();
+
+    // Navigate to ViewTutorList page with the filtered tutors
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ViewTutorList(
-          tutors: tutors, // Pass the list of tutors to the next page
+          tutors: matchingTutors, // Pass the list of tutors to the next page
+          selectedSubject: selectedSubject,  // the selected subject
+          selectedCity: selectedCity,  // the selected city
+          selectedClass: selectedClass,
         ),
       ),
     );
   }
+
+
 
   @override
   Widget build(BuildContext context) {

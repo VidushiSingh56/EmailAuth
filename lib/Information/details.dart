@@ -79,7 +79,7 @@ class _DetailsState extends State<Details> {
         );
 
         // Navigate to the appropriate screen based on the role
-        if (widget.role == 'student') {
+        if (widget.role == 'student' || widget.role == 'Student') {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => HomeA()),

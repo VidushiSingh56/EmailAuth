@@ -105,6 +105,7 @@ import 'package:projectemailauthdec1/Information/locations.dart';
 import 'package:projectemailauthdec1/Information/details.dart';
 import 'package:projectemailauthdec1/Tutors/home_tutor.dart';
 import 'package:projectemailauthdec1/Students/home_student.dart';
+import 'package:projectemailauthdec1/splashscreen.dart';
 
 class Wrapper extends StatefulWidget {
   const Wrapper({super.key});
@@ -168,23 +169,29 @@ class _WrapperState extends State<Wrapper> {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           // Check if user is authenticated
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting)
+          {
             return Center(child: CircularProgressIndicator());
           }
 
-          if (snapshot.hasData) {
+          if (snapshot.hasData)
+          {
             return FutureBuilder<Map<String, dynamic>?>(
               future: getUserDetails(),
-              builder: (context, detailsSnapshot) {
-                if (detailsSnapshot.connectionState == ConnectionState.waiting) {
+              builder: (context, detailsSnapshot)
+              {
+                if (detailsSnapshot.connectionState == ConnectionState.waiting)
+                {
                   return Center(child: CircularProgressIndicator());
                 }
 
-                if (detailsSnapshot.hasData) {
+                if (detailsSnapshot.hasData)
+                {
                   var details = detailsSnapshot.data!;
                   print({details['name']});
                   // Check if the name field exists
-                  if (details['name'] == null || details['name'].isEmpty) {
+                  if (details['name'] == null || details['name'].isEmpty)
+                  {
                     // Navigate to the Details screen if the name does not exist
 
                     return Details(
@@ -195,11 +202,12 @@ class _WrapperState extends State<Wrapper> {
                   }
 
                   // Check if the location is filled
-                  else if (details['isLocationFilled'] == true) {
+                  else if (details['isLocationFilled'] == true)
+                  {
                     // Navigate to the respective Home screen based on role
-                    if (details['role'] == 'tutor') {
+                    if (details['role'] == 'tutor' || details['role'] == 'Tutor') {
                       return HomeB();
-                    } else if (details['role'] == 'student') {
+                    } else if (details['role'] == 'student' || details['role'] == 'Student') {
                       return HomeA();
                     }
                   }
@@ -212,7 +220,7 @@ class _WrapperState extends State<Wrapper> {
                   }
                 }
                 // Default to Choose screen if no user data is found
-                return Login();
+                return SplashScreen();
               },
             );
           }
