@@ -3,7 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:projectemailauthdec1/Information/accounts.dart';
-import 'package:projectemailauthdec1/upload.dart';
+import 'package:projectemailauthdec1/Tutors/upload.dart';
+import 'package:projectemailauthdec1/search%20notes.dart';
 
 import '../authentication/login.dart';
 
@@ -204,7 +205,13 @@ class _HomeBState extends State<HomeB> {
                       SizedBox(
                         width: 250,
                         child: ElevatedButton(
-                          onPressed: downloadnotes,
+                          onPressed:()
+                          {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => Search()),
+                            );
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.amber,
                             minimumSize: const Size(double.infinity, 50),

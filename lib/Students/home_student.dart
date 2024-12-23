@@ -3,8 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:projectemailauthdec1/Information/accounts.dart';
+import 'package:projectemailauthdec1/Students/Find_Tutors.dart';
 
 import '../authentication/login.dart';
+import '../search notes.dart';
 
 class HomeA extends StatefulWidget {
   const HomeA({Key? key}) : super(key: key);
@@ -202,7 +204,13 @@ class _HomeAState extends State<HomeA> {
                       SizedBox(
                         width: 250,
                         child: ElevatedButton(
-                          onPressed: downloadnotes,
+                          onPressed:()
+                          {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => Search()),
+                            );
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.amber,
                             minimumSize: const Size(double.infinity, 50),
@@ -217,7 +225,13 @@ class _HomeAState extends State<HomeA> {
                       SizedBox(
                         width: 250,
                         child: ElevatedButton(
-                          onPressed: findhometutors,
+                          onPressed:()
+                          {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => FindHomeTutors()),
+                            );
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.amber,
                             minimumSize: const Size(double.infinity, 50),

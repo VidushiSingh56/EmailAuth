@@ -44,6 +44,13 @@ dependencies:
   permission_handler: ^11.3.1
   filesystem_picker: ^4.0.0
   file_picker: ^8.1.5
+  uuid: ^4.4.2
+  easy_pdf_viewer: ^1.0.8
+  flutter_cache_manager: ^3.0.0
+  path_provider: ^2.1.5
+  http: ^1.2.2
+  dio: ^5.7.0
+  path: ^1.9.0
 #  fluttertoast: ^8.2.8
 
 dependency_overrides:

@@ -66,9 +66,9 @@ class _WrapperState extends State<Wrapper> {
                   if (details['isLocationFilled']) {
                     // Navigate to the respective Home screen based on role
                     if (details['role'] == 'tutor') {
-                      return HomeA(); // Home screen for tutors
+                      return HomeB(); // Home screen for tutors
                     } else if (details['role'] == 'student') {
-                      return HomeB(); // Home screen for students
+                      return HomeA(); // Home screen for students
                     }
                   } else {
                     // If location is not filled, navigate to Locations screen
