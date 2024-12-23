@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:projectemailauthdec1/Students/home_student.dart';
 
+import '../Tutors/home_tutor.dart';
+
 class Details extends StatefulWidget {
   final String email;
   final String locationName;
@@ -64,7 +66,7 @@ class _DetailsState extends State<Details> {
         // Save details in Firestore (overwrite or create if not exists)
         await userDetails.set({
           'email': widget.email,
-          'role' : widget.role,
+          'role': widget.role,
           'location': locationController.text,
           'name': nameController.text,
           'classes': classesController.text,
@@ -76,11 +78,18 @@ class _DetailsState extends State<Details> {
           SnackBar(content: Text('Details submitted successfully!')),
         );
 
-        // Navigate to the next screen
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => HomeA()),
-        );
+        // Navigate to the appropriate screen based on the role
+        if (widget.role == 'student') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomeA()),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomeB()),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('User not authenticated. Please log in.')),
@@ -92,6 +101,7 @@ class _DetailsState extends State<Details> {
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
