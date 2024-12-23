@@ -196,13 +196,14 @@ class _ViewNotesListState extends State<ViewNotesList> {
               final data = documents[index].data() as Map<String, dynamic>;
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                elevation: 4,
+                elevation: 2,
+                color: Color(0xFFFFA600),
                 child: ListTile(
                   leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
-                  title: Text(data["name"] ?? "Unnamed File"),
+                  title: Text(data["subject"] ?? "Unnamed File", style: TextStyle(fontWeight : FontWeight.bold)),
                   subtitle: Text("Filename: ${widget.filename}"),
                   trailing: IconButton(
-                    icon: const Icon(Icons.download, color: Colors.blue),
+                    icon: const Icon(Icons.download, color: Colors.black87),
                     onPressed: () {
                       print("Download link: ${data["url"]}");
                       downloadPdfWithPath(data["url"]);

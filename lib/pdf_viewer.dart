@@ -99,7 +99,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           showNavigation: true,
           zoomSteps: 1,
           enableSwipeNavigation: true,
-          pickerButtonColor: const Color(0xFF34B89B),
+          pickerButtonColor: Colors.amber,
           // navigationBarColor: Colors.white,
           onPageChanged: (int page) {
             setState(() {

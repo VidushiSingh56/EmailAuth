@@ -23,10 +23,91 @@ class _LoginState extends State<Login> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
 
+  // signIn() async {
+  //   if (email.text.isEmpty || password.text.isEmpty) {
+  //     Get.snackbar(
+  //       "No entry.",
+  //       "Please enter both email and password.",
+  //       margin: EdgeInsets.all(20),
+  //       snackPosition: SnackPosition.BOTTOM,
+  //       backgroundColor: Colors.red.withOpacity(0.8),
+  //     );
+  //     return;
+  //   }
+  //
+  //   try {
+  //     UserCredential userCredential = await FirebaseAuth.instance
+  //         .signInWithEmailAndPassword(email: email.text, password: password.text);
+  //
+  //     final String userId = userCredential.user!.uid;
+  //
+  //     DocumentSnapshot userDoc = await FirebaseFirestore.instance
+  //         .collection('user')
+  //         .doc(userId)
+  //         .get();
+  //
+  //     if (userDoc.exists) {
+  //       String role = userDoc['role'];
+  //       String emails = userDoc['email'];
+  //       bool isLocationFilled = userDoc['location'] != null;
+  //       // bool isDetailsFilled = userDoc['detailsFilled'] ?? false;
+  //
+  //       if (role == 'Tutor' || role == 'Student') {
+  //         if (!isLocationFilled) {
+  //           Get.offAll(() => Locations(email: email.text, role : role)); // Pass email
+  //           return;
+  //         }
+  //
+  //         // if (!isDetailsFilled) {
+  //         //   Get.offAll(() => Details(
+  //         //     email: email.text,
+  //         //     role : role,
+  //         //     locationName: userDoc['location'],
+  //         //   )); // Pass email
+  //         //   return;
+  //         // }
+  //
+  //         if (role == 'Tutor') {
+  //           print(emails + "" + role);
+  //           Get.offAll(() => HomeB());
+  //
+  //         } else if (role == 'Student') {
+  //           print(emails + "" + role);
+  //           Get.offAll(() => HomeA());
+  //         }
+  //       } else {
+  //         Get.snackbar(
+  //           "Error",
+  //           "Unknown role assigned to the user.",
+  //           margin: EdgeInsets.all(20),
+  //           snackPosition: SnackPosition.BOTTOM,
+  //           backgroundColor: Colors.red.withOpacity(0.8),
+  //         );
+  //       }
+  //     } else {
+  //       Get.snackbar(
+  //         "Error",
+  //         "User data not found.",
+  //         margin: EdgeInsets.all(20),
+  //         snackPosition: SnackPosition.BOTTOM,
+  //         backgroundColor: Colors.red.withOpacity(0.8),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     print("Sign-in Error: $e");
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Invalid email or password. Please try again.'),
+  //         backgroundColor: Colors.red,
+  //       ),
+  //     );
+  //   }
+  // }
+
   signIn() async {
     if (email.text.isEmpty || password.text.isEmpty) {
       Get.snackbar(
-        "No entry.",
+        "No Entry",
         "Please enter both email and password.",
         margin: EdgeInsets.all(20),
         snackPosition: SnackPosition.BOTTOM,
@@ -47,32 +128,37 @@ class _LoginState extends State<Login> {
           .get();
 
       if (userDoc.exists) {
-        String role = userDoc['role'];
-        String emails = userDoc['email'];
-        bool isLocationFilled = userDoc['location'] != null;
-        // bool isDetailsFilled = userDoc['detailsFilled'] ?? false;
+        // Cast the data to a Map
+        Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+
+        String role = userData['role'] ?? '';
+        String emails = userData['email'] ?? '';
+        String? locationName = userData['location'];
+        String? name = userData['name'];
 
         if (role == 'Tutor' || role == 'Student') {
-          if (!isLocationFilled) {
-            Get.offAll(() => Locations(email: email.text, role : role)); // Pass email
+          // Check if location is not filled or doesn't exist
+          if (locationName == null || locationName.isEmpty) {
+            Get.offAll(() => Locations(email: emails, role: role)); // Redirect to Locations page
             return;
           }
 
-          // if (!isDetailsFilled) {
-          //   Get.offAll(() => Details(
-          //     email: email.text,
-          //     role : role,
-          //     locationName: userDoc['location'],
-          //   )); // Pass email
-          //   return;
-          // }
+          // Check if name is not filled or doesn't exist
+          if (name == null || name.isEmpty) {
+            Get.offAll(() => Details(
+              email: emails,
+              role: role,
+              locationName: locationName, // Send location name
+            )); // Redirect to Details page
+            return;
+          }
 
+          // Redirect to the respective home screen based on role
           if (role == 'Tutor') {
-            print(emails + "" + role);
+            print("$emails $role");
             Get.offAll(() => HomeB());
-
           } else if (role == 'Student') {
-            print(emails + "" + role);
+            print("$emails $role");
             Get.offAll(() => HomeA());
           }
         } else {
@@ -95,14 +181,16 @@ class _LoginState extends State<Login> {
       }
     } catch (e) {
       print("Sign-in Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Invalid email or password. Please try again.'),
-          backgroundColor: Colors.red,
-        ),
+      Get.snackbar(
+        "Sign-in Failed",
+        "Invalid email or password. Please try again.",
+        margin: EdgeInsets.all(20),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.8),
       );
     }
   }
+
 
 
 
