@@ -2,9 +2,16 @@
     xmlns:tools="http://schemas.android.com/tools"
      package="com.example.projectemailauthdec1">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
+    <!-- For Android 10 and below -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29" />
+
+    <!-- For Android 11+ -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+
+
 
     <application
         android:label="projectemailauthdec1"
@@ -24,7 +31,7 @@
                  while the Flutter UI initializes. After that, this theme continues
                  to determine the Window background behind the Flutter UI. -->
             <meta-data
-              android:name="io.flutter.embedding.android.NormalTheme"
+              android:name="io.flutter.embedding.EnableImpeller"
               android:resource="@style/NormalTheme"
               />
             <intent-filter>
@@ -37,7 +44,11 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-<!--        <queries>-->
+
+
+
+
+        <!--        <queries>-->
 <!--            <intent>-->
 <!--                <action android:name="android.intent.action.GET_CONTENT" />-->
 <!--            </intent>-->

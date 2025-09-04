@@ -7,6 +7,8 @@ import 'package:easy_pdf_viewer/easy_pdf_viewer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:projectemailauthdec1/pdf_viewer.dart';
+import 'package:projectemailauthdec1/widgets/ErrorSnackbar.dart';
+import 'package:open_filex/open_filex.dart';
 
 class ViewNotesList extends StatefulWidget {
   final String filename;
@@ -53,40 +55,27 @@ class _ViewNotesListState extends State<ViewNotesList> {
     return true;
   }
 
-  Future<void> _PDFViewer(String url) async {
+
+  Future<void> _openPdfFromFile(File file, {String? title}) async {
     try {
-      setState(() {
-        _isLoading = true;
-      });
+      PDFDocument document = await PDFDocument.fromFile(file);
 
-      // Request permission if needed
-      final hasPermissions = await _requestStoragePermission();
-      if (!hasPermissions) {
-        setState(() => _isLoading = false);
-        return;
-      }
-
-      // Use DefaultCacheManager to get the file from URL
-      File downloadedFile = await DefaultCacheManager().getSingleFile(url);
-      print("File downloaded to: ${downloadedFile.path}");
-
-      // Load PDF from downloaded file
-      PDFDocument document = await PDFDocument.fromFile(downloadedFile);
-
-      setState(() {
-        _document = document;
-        _isLoading = false;
-      });
-    } catch (e) {
-      print("Error in loading PDF: $e");
-      setState(() {
-        _isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error loading PDF: $e")),
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PDFViewerScreen(
+            document: document,
+            title: title ?? widget.filename,
+          ),
+        ),
       );
+    } catch (e) {
+      print("In-app viewer failed: $e");
+      // fallback external
+      await OpenFilex.open(file.path);
     }
   }
+
 
   Future<void> downloadPdfWithPath(String url) async {
     setState(() {
@@ -94,76 +83,70 @@ class _ViewNotesListState extends State<ViewNotesList> {
     });
 
     try {
-      print("Attempting to download from: $url");
-
-      // Request permissions first
+      // Request permissions first (only needed for Android < 11 with scoped storage disabled)
       final hasPermissions = await _requestStoragePermission();
       if (!hasPermissions) {
         setState(() => _isLoading = false);
         return;
       }
 
-      String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
-      print("Selected Directory: $selectedDirectory");
+      // Ask user where to save (Save As dialog)
+      String? savePath = await FilePicker.platform.saveFile(
+        dialogTitle: 'Save PDF As...',
+        fileName: "${widget.filename}.pdf",
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
 
-      if (selectedDirectory != null) {
-        try {
-          // Download file to temporary directory first
-          final tempDir = await getTemporaryDirectory();
-          final tempPath = '${tempDir.path}/${widget.filename}.pdf';
-
-          print("Starting file download...");
-          File downloadedFile = await DefaultCacheManager().getSingleFile(url);
-
-          // Create the destination directory if it doesn't exist
-          final destinationPath = '$selectedDirectory/${widget.filename}.pdf';
-          final destinationDir = Directory(selectedDirectory);
-          if (!await destinationDir.exists()) {
-            await destinationDir.create(recursive: true);
-          }
-
-          // Copy file to destination
-          print("Copying file to: $destinationPath");
-          final File newFile = await downloadedFile.copy(destinationPath);
-
-          // Verify file was created
-          if (await newFile.exists()) {
-            print("File copied successfully!");
-
-            // Load PDF for preview
-            PDFDocument document = await PDFDocument.fromFile(newFile);
-            setState(() {
-              _document = document;
-              _isLoading = false;
-            });
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("PDF downloaded successfully!")),
-            );
-          } else {
-            throw Exception("File was not created at destination");
-          }
-        } catch (e) {
-          print("Error in file download or saving: $e");
-          setState(() => _isLoading = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error saving PDF: ${e.toString()}")),
-          );
-        }
-      } else {
+      if (savePath == null) {
+        CustomRedSnackbar.showSnackbar(
+            titleText: "Cancelled", messageText: "The download has been cancelled");
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Download canceled.")),
-        );
+        return;
       }
+
+      // Download to temp first
+      File downloadedFile = await DefaultCacheManager().getSingleFile(url);
+
+      // Copy to user-selected path
+      final File newFile = await downloadedFile.copy(savePath);
+
+      if (await newFile.exists()) {
+        CustomGreenSnackbar.showSnackbar(
+            titleText: "Success!!",
+            messageText: "PDF saved at ${newFile.path}");
+
+        // ✅ Open inside your in-app PDF viewer
+        try {
+          PDFDocument document = await PDFDocument.fromFile(newFile);
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PDFViewerScreen(
+                document: document,
+                title: widget.filename,
+              ),
+            ),
+          );
+        } catch (e) {
+          print("In-app viewer failed, opening externally: $e");
+          await OpenFilex.open(newFile.path);
+        }
+      }
+
+      setState(() => _isLoading = false);
     } catch (e) {
-      print("Overall error: $e");
+      print("Download error: $e");
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error downloading PDF: ${e.toString()}")),
+        SnackBar(content: Text("Error downloading PDF: $e")),
       );
     }
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -196,8 +179,8 @@ class _ViewNotesListState extends State<ViewNotesList> {
               final data = documents[index].data() as Map<String, dynamic>;
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                elevation: 2,
-                color: Color(0xFFFFA600),
+                elevation: 1,
+                color: Color(0xFFF8C25D),
                 child: ListTile(
                   leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
                   title: Text(data["subject"] ?? "Unnamed File", style: TextStyle(fontWeight : FontWeight.bold)),
@@ -211,38 +194,31 @@ class _ViewNotesListState extends State<ViewNotesList> {
                   ),
 
                   onTap: () async {
-                    // Show loading screen
+                    // Show loading dialog
                     showDialog(
                       barrierDismissible: false,
                       context: context,
                       builder: (BuildContext context) {
                         return const Scaffold(
-                          body: Center(
-                            child: CircularProgressIndicator(),
-                          ),
+                          body: Center(child: CircularProgressIndicator()),
                         );
                       },
                     );
 
-                    // Load PDF
-                    await _PDFViewer(data["url"]);
+                    try {
+                      // Download to cache (not Downloads folder, just temp for viewing)
+                      File downloadedFile = await DefaultCacheManager().getSingleFile(data["url"]);
 
-                    // Close loading screen
-                    Navigator.pop(context);
-
-                    if (_document != null) {
-                      // Navigate to PDF viewer screen
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PDFViewerScreen(
-                            document: _document!,
-                            title: data["name"] ?? "PDF Viewer",
-                          ),
-                        ),
+                      Navigator.pop(context); // close loading
+                      await _openPdfFromFile(downloadedFile, title: data["name"]);
+                    } catch (e) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Error opening PDF: $e")),
                       );
                     }
                   },
+
                 ),
               );
             },

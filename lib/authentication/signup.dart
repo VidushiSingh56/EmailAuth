@@ -77,34 +77,54 @@ class _SignupState extends State<Signup> {
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(20.0),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
-
               children: [
-                TextField(
-                  controller: email,
-                  decoration: InputDecoration(hintText: 'Enter email'),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 30.0), // Adds space below the image
+                  child: Image( // Using your provided Image widget structure
+                    width: 350,
+                    image: const AssetImage('assets/images/school-students-digital-art-style-education-day.jpg'), // Ensure this path is correct
+                    errorBuilder: (context, error, stackTrace) {
+                      // Optional: Print the error for debugging
+                      print("Error loading asset image: $error");
+                      print("Stack trace: $stackTrace");
+                      return const Icon(
+                        Icons.broken_image,
+                        size: 250, // Match a similar size or adjust
+                        color: Colors.grey, // Changed color for better visibility if on white background
+                      );
+                    },
+                  ),
                 ),
-                SizedBox(height: 20),
-                TextField(
-                  controller: password,
-                  obscureText: true, // To hide the password input
-                  decoration: InputDecoration(hintText: 'Enter password'),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: email,
+                      decoration: InputDecoration(hintText: 'Enter email'),
+                    ),
+                    SizedBox(height: 20),
+                    TextField(
+                      controller: password,
+                      obscureText: true, // To hide the password input
+                      decoration: InputDecoration(hintText: 'Enter password'),
+                    ),
+                    SizedBox(height: 50),
+                    ElevatedButton(
+                  onPressed: signUp,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.amber,
+                    minimumSize: Size(130, 50),// Background color of the button
+                  ),
+                  child: Text(
+                    "Sign Up",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20// Text color
+                    ),
+                  ),
                 ),
-                SizedBox(height: 50),
-            ElevatedButton(
-              onPressed: signUp,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amber,
-                minimumSize: Size(130, 50),// Background color of the button
-              ),
-              child: Text(
-                "Sign Up",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20// Text color
+                  ],
                 ),
-              ),
-            ),
               ],
             ),
           ),

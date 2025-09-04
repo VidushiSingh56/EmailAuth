@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:projectemailauthdec1/widgets/stroke.dart';
 import 'dart:io';
 
 import '../authentication/login.dart';
@@ -84,13 +85,40 @@ class _AccountsState extends State<Accounts> {
 
 
   signout() async {
-    await FirebaseAuth.instance.signOut();
-    // Navigate to the login screen and clear the navigation stack
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => Login()),
-          (route) => false,
+    // Show a confirmation dialog
+    bool? confirmExit = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Are you sure you want to sign out?"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // User pressed "No"
+              },
+              child: Text("No"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // User pressed "Yes"
+              },
+              child: Text("Yes"),
+            ),
+          ],
+        );
+      },
     );
+
+    // If the user confirms, sign them out
+    if (confirmExit == true) {
+      await FirebaseAuth.instance.signOut();
+      // Navigate to the login screen and clear the navigation stack
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => Login()),
+            (route) => false,
+      );
+    }
   }
   @override
   Widget build(BuildContext context) {
@@ -106,118 +134,125 @@ class _AccountsState extends State<Accounts> {
             style: TextStyle(fontSize: 18),
           ),
         )
-            : Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20.0, vertical: 50.0
-              ),
-              child: Align(
-                alignment: Alignment.center,
-                child: Container(
-                  width: 300,
-                  height: 1000,
-                  // color: Colors.grey,
-                  child: Column(
-                    // mainAxisSize: MainAxisSize.min, // Centers content vertically
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Name',
-                            style: const TextStyle(fontSize: 20),
-                          ),
-                          Text('$userName',
-                          style: const TextStyle(color: Color(0xFF34B89B),fontSize: 20 ),)
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Email',
-                            style: const TextStyle(fontSize: 20),
-                          ),
-                          Text('$userEmail',
-                            style: const TextStyle(color: Color(0xFF34B89B),fontSize: 20 ),)
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Profession',
-                            style: const TextStyle(fontSize: 20),
-                          ),
-                          Text('$userRole',
-                            style: const TextStyle(color: Color(0xFF34B89B),fontSize: 20 ),)
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Column(
+            : SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.05,
+                    vertical: MediaQuery.of(context).size.width * 0.1,
+                ),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.8,  // 80% of the screen width
+                    // height: MediaQuery.of(context).size.height * 0.8,
+
+                    // color: Colors.grey,
+                    child: Column(
+                      // mainAxisSize: MainAxisSize.min, // Centers content vertically
+
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Subject',
-                          style: const TextStyle(fontSize: 20),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Name',
+                              style: TextStyle(fontSize: 17, color: Colors.grey.shade600),
+                            ),
+                            Text('$userName',
+                            style: const TextStyle(color: Color(0xFF289E85),fontSize: 18 ))
+                          ],
                         ),
-                        Text('$userSub',
-                          style: const TextStyle(color: Color(0xFF34B89B),fontSize: 20 ),)
+                        Strokes(),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Email',
+                              style: TextStyle(fontSize: 17, color: Colors.grey.shade600),
+                            ),
+                            Text('$userEmail',
+                                style: const TextStyle(color: Color(0xFF289E85),fontSize: 18 ))
+                          ],
+                        ),
+                        Strokes(),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Profession',
+                              style: TextStyle(fontSize: 17, color: Colors.grey.shade600),
+                            ),
+                            Text('$userRole',
+                                style: const TextStyle(color: Color(0xFF289E85),fontSize: 18 ))
+                          ],
+                        ),
+                        Strokes(),
+                        Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Subject',
+                            style: TextStyle(fontSize: 17, color: Colors.grey.shade600),
+                          ),
+                          Text('$userSub',
+                              style: const TextStyle(color: Color(0xFF289E85),fontSize: 18 ))
+                        ],
+                      ),
+                        Strokes(),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'City',
+                              style: TextStyle(fontSize: 17, color: Colors.grey.shade600),
+                            ),
+                            Text('$userLocation',
+                                style: const TextStyle(color: Color(0xFF289E85),fontSize: 18 ))
+                          ],
+                        ),
+                        Strokes(),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Class',
+                              style: TextStyle(fontSize: 17, color: Colors.grey.shade600),
+                            ),
+                            Text('$userClass',
+                                style: const TextStyle(color: Color(0xFF289E85),fontSize: 18 ))
+                          ],
+                        ),
+                        Strokes(),
+
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Description',
+                              style: TextStyle(fontSize: 17, color: Colors.grey.shade600),
+                            ),
+                            Text('$userDes',
+                                style: const TextStyle(color: Color(0xFF289E85),fontSize: 18 ))
+                          ],
+                        ),
+                        SizedBox(height: 25,),
+                        ElevatedButton(
+                          onPressed: signout,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.amber,
+
+                              minimumSize: Size(double.infinity, 50),
+                            ),
+                          child: const Text('Sign Out',
+                          style: TextStyle(color: Colors.white,fontSize: 20),),
+                        ),
                       ],
+              
                     ),
-                      const SizedBox(height: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'City',
-                            style: const TextStyle(fontSize: 20),
-                          ),
-                          Text('$userLocation',
-                            style: const TextStyle(color: Color(0xFF34B89B),fontSize: 20 ),)
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Class',
-                            style: const TextStyle(fontSize: 20),
-                          ),
-                          Text('$userClass',
-                            style: const TextStyle(color: Color(0xFF34B89B),fontSize: 20 ),)
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Description',
-                            style: const TextStyle(fontSize: 20),
-                          ),
-                          Text('$userDes',
-                            style: const TextStyle(color: Color(0xFF34B89B),fontSize: 20 ),)
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: signout,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.amber,
-                            minimumSize: Size(double.infinity, 50),
-                          ),
-                        child: const Text('Sign Out',
-                        style: TextStyle(color: Colors.white,fontSize: 20),),
-                      ),
-                    ],
-
                   ),
+              
                 ),
-
               ),
             ),
 

@@ -97,7 +97,7 @@ class _FindHomeTutorsState extends State<FindHomeTutors> {
       final classMatch = tutor['classes'] == selectedClass;
 
       // Add more conditions if needed
-      return subjectMatch || cityMatch || classMatch;
+      return cityMatch;
     }).toList();
 
     // Navigate to ViewTutorList page with the filtered tutors

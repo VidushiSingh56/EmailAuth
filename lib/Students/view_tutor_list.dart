@@ -1,8 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:get/get.dart';
 import '../Information/accounts.dart';
+import '../chat/chat_screen.dart';
+import '../services/chat_service.dart';
 
 class ViewTutorList extends StatefulWidget {
   final List<DocumentSnapshot> tutors; // Accept the list of tutors
@@ -23,6 +25,41 @@ class ViewTutorList extends StatefulWidget {
 }
 
 class _ViewTutorListState extends State<ViewTutorList> {
+  final ChatService _chatService = ChatService();
+
+  Future<void> _startChat(DocumentSnapshot tutor) async {
+    try {
+      final chatRoomId = await _chatService.createOrGetChatRoom(
+        otherUserId: tutor.id,
+        otherUserName: tutor['name'] ?? 'Unknown',
+        otherUserRole: 'Tutor',
+      );
+
+      Get.to(() => ChatScreen(
+        chatRoomId: chatRoomId,
+        otherParticipantName: tutor['name'] ?? 'Unknown',
+        otherParticipantRole: 'Tutor',
+      ));
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to start chat: $e',
+        backgroundColor: Colors.red.withOpacity(0.8),
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  void _viewProfile(DocumentSnapshot tutor) {
+    // You can implement profile view functionality here
+    Get.snackbar(
+      'Profile',
+      'Viewing profile of ${tutor['name']}',
+      backgroundColor: Colors.blue.withOpacity(0.8),
+      colorText: Colors.white,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,6 +133,41 @@ class _ViewTutorListState extends State<ViewTutorList> {
                   Text(
                     'Experience: ${tutor['description']} years',
                     style: const TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => _startChat(tutor),
+                          icon: const Icon(Icons.chat, color: Colors.white),
+                          label: const Text(
+                            'Start Chat',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => _viewProfile(tutor),
+                          icon: const Icon(Icons.person, color: Colors.white),
+                          label: const Text(
+                            'View Profile',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

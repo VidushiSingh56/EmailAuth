@@ -87,6 +87,7 @@ class _SearchState extends State<Search> {
         child: Center(
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             SizedBox(height: MediaQuery.of(context).size.height * .03),
+
             DropdownWithText(
               selectedValue: selectedBoard,
               options: boardOptions,

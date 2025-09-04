@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:projectemailauthdec1/Information/accounts.dart';
 import 'package:projectemailauthdec1/Students/Find_Tutors.dart';
+import 'package:projectemailauthdec1/chat/chat_list_screen.dart';
+import 'package:projectemailauthdec1/widgets/chat_notification_badge.dart';
 
 import '../authentication/login.dart';
 import '../search notes.dart';
@@ -28,14 +30,51 @@ class _HomeAState extends State<HomeA> {
     fetchUserEmail();
   }
 
+  // signout() async {
+  //   await FirebaseAuth.instance.signOut();
+  //   // Navigate to the login screen and clear the navigation stack
+  //   Navigator.pushAndRemoveUntil(
+  //     context,
+  //     MaterialPageRoute(builder: (context) => Login()),
+  //         (route) => false,
+  //   );
+  // }
+
   signout() async {
-    await FirebaseAuth.instance.signOut();
-    // Navigate to the login screen and clear the navigation stack
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => Login()),
-          (route) => false,
+    // Show a confirmation dialog
+    bool? confirmExit = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Are you sure you want to sign out?", style: TextStyle(fontSize: 20),),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // User pressed "No"
+              },
+              child: Text("No"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // User pressed "Yes"
+              },
+              child: Text("Yes"),
+            ),
+          ],
+        );
+      },
     );
+
+    // If the user confirms, sign them out
+    if (confirmExit == true) {
+      await FirebaseAuth.instance.signOut();
+      // Navigate to the login screen and clear the navigation stack
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => Login()),
+            (route) => false,
+      );
+    }
   }
 
   Future<void> fetchUserEmail() async {
@@ -153,12 +192,12 @@ class _HomeAState extends State<HomeA> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Color(0xFF34B89B),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              // Handle back button press
-            },
-          ),
+          // leading: IconButton(
+          //   icon: Icon(Icons.arrow_back),
+          //   onPressed: () {
+          //     // Handle back button press
+          //   },
+          // ),
           title: Text(
             "Home",
             textAlign: TextAlign.center,
@@ -168,8 +207,27 @@ class _HomeAState extends State<HomeA> {
           ),
           centerTitle: true,
           actions: [
+            Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.chat),
+                  color: Colors.black,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ChatListScreen()),
+                    );
+                  },
+                ),
+                // Positioned(
+                //   right: 8,
+                //   top: 8,
+                //   child: ChatNotificationBadge(size: 16),
+                // ),
+              ],
+            ),
             IconButton(
-              icon: Icon(Icons.person),
+              icon: const Icon(Icons.person),
               color: Colors.black,
               onPressed: () {
                 Navigator.push(
@@ -177,8 +235,7 @@ class _HomeAState extends State<HomeA> {
                   MaterialPageRoute(builder: (context) => Accounts(userId : user_id)),
                 );
               },
-            )
-            ,
+            ),
           ],
         ),
         body: user_name == null
@@ -190,7 +247,7 @@ class _HomeAState extends State<HomeA> {
             children: [
               SizedBox(height: 20),
               Text(
-                "Welcome!",
+                "Welcome!!",
                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
               ),
               Text('$user_name',
@@ -238,6 +295,27 @@ class _HomeAState extends State<HomeA> {
                           ),
                           child: const Text(
                             "Find Home Tutors",
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: 250,
+                        child: ElevatedButton(
+                          onPressed:()
+                          {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => ChatListScreen()),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            minimumSize: const Size(double.infinity, 50),
+                          ),
+                          child: const Text(
+                            "Chats",
                             style: TextStyle(color: Colors.white, fontSize: 20),
                           ),
                         ),

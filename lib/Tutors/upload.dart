@@ -9,6 +9,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:projectemailauthdec1/Information/accounts.dart';
 import 'package:projectemailauthdec1/Information/details.dart';
 import 'package:projectemailauthdec1/authentication/login.dart';
+import 'package:projectemailauthdec1/widgets/ErrorSnackbar.dart';
 import 'package:uuid/uuid.dart';
 import '../../../widgets/drop_down_with_text.dart';
 // import '../Profile.dart';
@@ -90,15 +91,18 @@ class _Upload extends State<Upload> {
 
       });
 
-      Fluttertoast.showToast(
-        msg: "PDF uploaded successfully",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      // Fluttertoast.showToast(
+      //   msg: "PDF uploaded successfully",
+      //   toastLength: Toast.LENGTH_SHORT,
+      //   gravity: ToastGravity.BOTTOM,
+      //   timeInSecForIosWeb: 1,
+      //   backgroundColor: Colors.green,
+      //   textColor: Colors.white,
+      //   fontSize: 16.0,
+      // );
+
+      CustomGreenSnackbar.showSnackbar(titleText: "Success!!", messageText: "PDF uploaded successfully");
+
     }
   }
 

@@ -18,9 +18,24 @@ class Details extends StatefulWidget {
 }
 
 class _DetailsState extends State<Details> {
+  String selectedSubject = '';
+  List<String> subjectOptions = [
+    'Mathematics',
+    'Physics',
+    'Chemistry',
+    'Biology',
+    'English',
+    'History',
+    'Geography',
+    'Economics',
+    'Computer Science',
+    'Accountancy',
+    'Business Studies',
+    'Others'
+  ];
+
   late TextEditingController locationController;
   final TextEditingController classesController = TextEditingController();
-  final TextEditingController subjectController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
 
@@ -34,7 +49,6 @@ class _DetailsState extends State<Details> {
   void dispose() {
     locationController.dispose();
     classesController.dispose();
-    subjectController.dispose();
     descriptionController.dispose();
     nameController.dispose();
     super.dispose();
@@ -44,7 +58,7 @@ class _DetailsState extends State<Details> {
     if (locationController.text.isEmpty ||
         nameController.text.isEmpty ||
         classesController.text.isEmpty ||
-        subjectController.text.isEmpty ||
+        selectedSubject.isEmpty ||
         descriptionController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please fill all the details')),
@@ -53,24 +67,20 @@ class _DetailsState extends State<Details> {
     }
 
     try {
-      // Get the current user's UID
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         String uid = user.uid;
 
-        // Reference to the user's document in Firestore
-        DocumentReference userDetails = FirebaseFirestore.instance
-            .collection('user')
-            .doc(uid);
+        DocumentReference userDetails =
+        FirebaseFirestore.instance.collection('user').doc(uid);
 
-        // Save details in Firestore (overwrite or create if not exists)
         await userDetails.set({
           'email': widget.email,
           'role': widget.role,
           'location': locationController.text,
           'name': nameController.text,
           'classes': classesController.text,
-          'subject': subjectController.text,
+          'subject': selectedSubject,
           'description': descriptionController.text,
         });
 
@@ -78,8 +88,7 @@ class _DetailsState extends State<Details> {
           SnackBar(content: Text('Details submitted successfully!')),
         );
 
-        // Navigate to the appropriate screen based on the role
-        if (widget.role == 'student' || widget.role == 'Student') {
+        if (widget.role.toLowerCase() == 'student') {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => HomeA()),
@@ -102,13 +111,13 @@ class _DetailsState extends State<Details> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-
-
+      appBar: AppBar(
+        title: Text("Details Form", style: TextStyle(fontFamily: 'Poppins'),),
+        backgroundColor: Color(0xFF34B89B),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(
@@ -116,14 +125,14 @@ class _DetailsState extends State<Details> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Email (read-only)
                 TextField(
                   controller: TextEditingController(text: widget.email),
                   decoration: InputDecoration(
                     labelText: 'Email',
                     border: OutlineInputBorder(),
                   ),
-                  enabled: false, // Make the field uneditable
+                  style: TextStyle(fontFamily: 'Poppins'),
+                  enabled: false,
                 ),
                 SizedBox(height: 20),
                 TextField(
@@ -132,51 +141,65 @@ class _DetailsState extends State<Details> {
                     labelText: 'Role',
                     border: OutlineInputBorder(),
                   ),
-                  enabled: false, // Make the field uneditable
+                  enabled: false,
+                  style: TextStyle(fontFamily: 'Poppins'),
                 ),
                 SizedBox(height: 20),
-
-                // Location (editable)
                 TextField(
                   controller: locationController,
                   decoration: InputDecoration(
                     labelText: 'Location Name',
                     border: OutlineInputBorder(),
                   ),
+                  style: TextStyle(fontFamily: 'Poppins'),
                 ),
                 SizedBox(height: 20),
-
-                // Name
                 TextField(
                   controller: nameController,
                   decoration: InputDecoration(
                     labelText: 'Enter Name',
                     border: OutlineInputBorder(),
                   ),
+                  style: TextStyle(fontFamily: 'Poppins'),
                 ),
                 SizedBox(height: 20),
-
-                // Classes
                 TextField(
                   controller: classesController,
                   decoration: InputDecoration(
                     labelText: 'Enter Class',
                     border: OutlineInputBorder(),
                   ),
+                  style: TextStyle(fontFamily: 'Poppins'),
                 ),
                 SizedBox(height: 20),
 
-                // Subject
-                TextField(
-                  controller: subjectController,
-                  decoration: InputDecoration(
-                    labelText: 'Enter Subject',
-                    border: OutlineInputBorder(),
-                  ),
+                // Dropdown for subject selection
+            Container(
+              // width: 200,
+              child: DropdownButtonFormField<String>(
+                value: selectedSubject.isNotEmpty ? selectedSubject : null,
+                decoration: InputDecoration(
+                  labelText: 'Select Subject',
+                  border: OutlineInputBorder(),
                 ),
+                dropdownColor: Color(0xfff1dada),
+
+                items: subjectOptions.map((String subject) {
+                  return DropdownMenuItem<String>(
+                    value: subject,
+                    child: Text(subject, style: TextStyle(color: Colors.black, fontFamily: 'Poppins')), // Sets text color to white for contrast
+                  );
+                }).toList(),
+                onChanged: (newValue) {
+                  setState(() {
+                    selectedSubject = newValue!;
+                  });
+                },
+              ),
+            ),
+
                 SizedBox(height: 20),
 
-                // Description
                 TextField(
                   controller: descriptionController,
                   decoration: InputDecoration(
@@ -185,10 +208,10 @@ class _DetailsState extends State<Details> {
                   ),
                   minLines: 3,
                   maxLines: 5,
+                  style: TextStyle(fontFamily: 'Poppins'),
                 ),
                 SizedBox(height: 30),
 
-                // Submit Button
                 ElevatedButton(
                   onPressed: submitDetails,
                   style: ElevatedButton.styleFrom(
@@ -197,7 +220,7 @@ class _DetailsState extends State<Details> {
                   ),
                   child: Text(
                     "Submit",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
+                    style: TextStyle(color: Colors.white, fontSize: 20, fontFamily: 'Poppins'),
                   ),
                 ),
               ],
@@ -208,3 +231,4 @@ class _DetailsState extends State<Details> {
     );
   }
 }
+

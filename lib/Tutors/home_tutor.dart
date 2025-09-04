@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:projectemailauthdec1/Information/accounts.dart';
 import 'package:projectemailauthdec1/Tutors/upload.dart';
 import 'package:projectemailauthdec1/search%20notes.dart';
+import 'package:projectemailauthdec1/chat/chat_list_screen.dart';
+import 'package:projectemailauthdec1/widgets/chat_notification_badge.dart';
 
 import '../authentication/login.dart';
 
@@ -29,13 +31,40 @@ class _HomeBState extends State<HomeB> {
   }
 
   signout() async {
-    await FirebaseAuth.instance.signOut();
-    // Navigate to the login screen and clear the navigation stack
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => Login()),
-          (route) => false,
+    // Show a confirmation dialog
+    bool? confirmExit = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Are you sure you want to sign out?"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // User pressed "No"
+              },
+              child: Text("No"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // User pressed "Yes"
+              },
+              child: Text("Yes"),
+            ),
+          ],
+        );
+      },
     );
+
+    // If the user confirms, sign them out
+    if (confirmExit == true) {
+      await FirebaseAuth.instance.signOut();
+      // Navigate to the login screen and clear the navigation stack
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => Login()),
+            (route) => false,
+      );
+    }
   }
 
   Future<void> fetchUserEmail() async {
@@ -91,14 +120,7 @@ class _HomeBState extends State<HomeB> {
     }
   }
 
-  downloadnotes() async{
 
-  }
-
- uploadnotes() async{
-
-
-  }
 
 
   Future<bool?> _showExitConfirmationDialog() async {
@@ -169,8 +191,27 @@ class _HomeBState extends State<HomeB> {
           ),
           centerTitle: true,
           actions: [
+            Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.chat),
+                  color: Colors.black,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ChatListScreen()),
+                    );
+                  },
+                ),
+                // Positioned(
+                //   right: 8,
+                //   top: 8,
+                //   child: ChatNotificationBadge(size: 16),
+                // ),
+              ],
+            ),
             IconButton(
-              icon: Icon(Icons.person),
+              icon: const Icon(Icons.person),
               color: Colors.black,
               onPressed: () {
                 Navigator.push(
@@ -178,8 +219,7 @@ class _HomeBState extends State<HomeB> {
                   MaterialPageRoute(builder: (context) => Accounts(userId : user_id)),
                 );
               },
-            )
-            ,
+            ),
           ],
         ),
         body: user_name == null
@@ -243,6 +283,27 @@ class _HomeBState extends State<HomeB> {
                             ),
                           ),
 
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: 250,
+                        child: ElevatedButton(
+                          onPressed:()
+                          {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => ChatListScreen()),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            minimumSize: const Size(double.infinity, 50),
+                          ),
+                          child: const Text(
+                            "Chats",
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                        ),
                       ),
                     ],
                   ),

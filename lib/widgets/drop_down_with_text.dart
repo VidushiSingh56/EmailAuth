@@ -29,6 +29,7 @@ class DropdownWithText extends StatelessWidget {
           child: DropdownButton<String>(
             value: selectedValue,
             onChanged: onChanged,
+            // dropdownColor: Color(0xFFFDF5F5),
             style: const TextStyle(color: Colors.black, fontSize: 16),
             isExpanded: true,
             icon: const Icon(Icons.arrow_drop_down, color: Colors.black),
@@ -39,7 +40,9 @@ class DropdownWithText extends StatelessWidget {
             items: options.map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
-                child: Text(value),
+                child: Text(value,
+                ),
+
               );
             }).toList(),
           ),
